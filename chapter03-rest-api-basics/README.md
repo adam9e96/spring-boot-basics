@@ -60,3 +60,83 @@ Content-Type: application/json
 - `dto`: 요청 바인딩용 객체
 - `model`: Todo 도메인 객체
 - `exception`: 404 응답 처리
+
+### 요청 흐름도
+
+```mermaid
+flowchart LR
+    Client["Client\n(HTTP)"]
+
+    subgraph SpringBoot["Spring Boot Application"]
+        Controller["TodoController\n@RestController"]
+        Service["TodoService\n@Service"]
+        Store[("ConcurrentHashMap\n(메모리 저장소)")]
+        ExHandler["GlobalExceptionHandler\n@RestControllerAdvice"]
+    end
+
+    Client -- "요청\nGET/POST/PUT/DELETE\n/todos" --> Controller
+    Controller -- "위임" --> Service
+    Service -- "CRUD" --> Store
+    Service -. "TodoNotFoundException" .-> ExHandler
+    ExHandler -. "404 Not Found\n{message: ...}" .-> Client
+    Controller -- "200/201/204\nJSON 응답" --> Client
+```
+
+### 클래스 다이어그램
+
+```mermaid
+classDiagram
+    class TodoController {
+        -TodoService todoService
+        +getTodos() List~Todo~
+        +getTodo(id) Todo
+        +createTodo(request) Todo
+        +updateTodo(id, request) Todo
+        +deleteTodo(id) void
+    }
+
+    class TodoService {
+        -Map~Long, Todo~ todoStore
+        -AtomicLong sequence
+        +findAll() List~Todo~
+        +findById(id) Todo
+        +create(request) Todo
+        +update(id, request) Todo
+        +delete(id) void
+    }
+
+    class Todo {
+        -Long id
+        -String title
+        -String description
+        -boolean completed
+    }
+
+    class TodoCreateRequest {
+        <<record>>
+        +String title
+        +String description
+    }
+
+    class TodoUpdateRequest {
+        <<record>>
+        +String title
+        +String description
+        +boolean completed
+    }
+
+    class TodoNotFoundException {
+        +TodoNotFoundException(id)
+    }
+
+    class GlobalExceptionHandler {
+        +handleTodoNotFound(ex) Map
+    }
+
+    TodoController --> TodoService : 의존성 주입
+    TodoService --> Todo : 생성/조회/수정/삭제
+    TodoService --> TodoNotFoundException : throws
+    TodoController ..> TodoCreateRequest : @RequestBody
+    TodoController ..> TodoUpdateRequest : @RequestBody
+    GlobalExceptionHandler ..> TodoNotFoundException : @ExceptionHandler
+```
