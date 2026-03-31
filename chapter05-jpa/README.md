@@ -90,6 +90,34 @@ Chapter 03에서 `ConcurrentHashMap`으로 구현했던 저장소를 실제 데�
 Hibernate가 H2 DB에 실행합니다. `application.yaml`의 `show-sql: true` 설정으로
 콘솔에서 자동 생성된 SQL을 확인할 수 있습니다.
 
+## H2 데이터베이스란?
+
+**H2**는 Java로 작성된 **인메모리 관계형 데이터베이스**입니다.
+
+### 왜 H2를 사용하는가?
+
+| 특징 | 설명 |
+|------|------|
+| **설치 불필요** | MySQL, PostgreSQL처럼 별도 설치/실행이 필요 없다. 의존성만 추가하면 끝 |
+| **인메모리 모드** | 애플리케이션 시작 시 DB가 생성되고, 종료 시 사라진다. 환경 오염 없음 |
+| **빠른 피드백** | DB 설정 없이 JPA 학습과 API 테스트에 바로 집중할 수 있다 |
+| **SQL 호환** | 표준 SQL을 지원하므로 나중에 MySQL/PostgreSQL로 교체해도 코드 변경이 거의 없다 |
+| **웹 콘솔 제공** | `http://localhost:8080/h2-console`에서 브라우저로 데이터를 직접 조회/수정 가능 |
+
+### 학습 단계에서의 역할
+
+```
+Chapter 03: ConcurrentHashMap (순수 메모리, DB 없음)
+       ↓
+Chapter 05: H2 인메모리 DB (JPA + 실제 SQL 실행) ← 현재
+       ↓
+실무:       MySQL / PostgreSQL (운영 DB)
+```
+
+Chapter 03에서는 `ConcurrentHashMap`으로 데이터를 저장했지만, 이는 실제 DB가 아니라 SQL도 없고 테이블 구조도 없었습니다.
+H2를 도입하면 **JPA가 실제 SQL을 생성하고 실행하는 과정**을 `show-sql: true` 옵션으로 직접 확인할 수 있습니다.
+나중에 운영 DB로 전환할 때는 `application.yaml`의 접속 정보만 바꾸면 됩니다.
+
 ## 핵심 개념
 
 - **JPA Entity** — `@Entity`, `@Id`, `@GeneratedValue`로 테이블과 매핑되는 자바 객체 정의
