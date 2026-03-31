@@ -1,0 +1,17 @@
+app:
+  greeting: "[PROD] 운영 환경입니다"
+  api:
+    base-url: https://api.example.com
+    timeout: 3s
+    max-retries: 2
+    allowed-origins:
+      - https://example.com
+      - https://www.example.com
+  features:
+    notification-enabled: true
+    maintenance-mode: false
+
+logging:
+  level:
+    com.adam9e96.chapter042config: WARN
+    org.springframework.web: WARN

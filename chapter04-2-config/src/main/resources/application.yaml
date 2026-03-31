@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: chapter04-2-config
+
+app:
+  name: Spring Boot 학습 프로젝트
+  version: 1.0.0
+  description: 설정과 프로파일을 배우는 챕터입니다
+  greeting: 안녕하세요
+  contact:
+    email: admin@example.com
+    phone: 02-1234-5678
+  api:
+    base-url: http://localhost:8080
+    timeout: 5s
+    max-retries: 3
+    allowed-origins:
+      - http://localhost:3000
+  features:
+    notification-enabled: true
+    maintenance-mode: false
