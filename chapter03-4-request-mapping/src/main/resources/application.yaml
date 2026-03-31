@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: chapter03-4-request-mapping
