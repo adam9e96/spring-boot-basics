@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: chapter02-1-lombok

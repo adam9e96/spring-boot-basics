@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: chapter03-1-rest-api-basics

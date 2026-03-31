@@ -25,8 +25,8 @@ Spring Boot를 멀티 모듈 형태로 가볍게 실습하는 학습 프로젝�
 ```text
 spring-boot-basics/
 ├─ chapter01-hello/             # 가장 단순한 Spring Boot 웹 애플리케이션
-├─ chapter02-lombok/            # Lombok 어노테이션 실습
-├─ chapter03-rest-api-basics/   # REST API CRUD 실습
+├─ chapter02-1-lombok/          # Lombok 어노테이션 실습
+├─ chapter03-1-rest-api-basics/ # REST API CRUD 실습
 ├─ build.gradle                 # 공통 플러그인/의존성 설정
 └─ settings.gradle              # 멀티 모듈 등록
 ```
@@ -76,10 +76,10 @@ spring-boot-basics/
 ./gradlew :chapter01-hello:bootRun
 
 # Chapter 02
-./gradlew :chapter02-lombok:bootRun
+./gradlew :chapter02-1-lombok:bootRun
 
 # Chapter 03
-./gradlew :chapter03-rest-api-basics:bootRun
+./gradlew :chapter03-1-rest-api-basics:bootRun
 ```
 
 Windows에서는 `./gradlew` 대신 `.\gradlew.bat`을 사용합니다.
@@ -91,8 +91,8 @@ Windows에서는 `./gradlew` 대신 `.\gradlew.bat`을 사용합니다.
 ./gradlew test
 
 # 특정 챕터 테스트
-./gradlew :chapter02-lombok:test
-./gradlew :chapter03-rest-api-basics:test
+./gradlew :chapter02-1-lombok:test
+./gradlew :chapter03-1-rest-api-basics:test
 ```
 
 ## 학습 메모
