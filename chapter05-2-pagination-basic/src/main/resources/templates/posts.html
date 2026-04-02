@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 목록 - 수동 페이지네이션</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f5f5f5;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pagination a, .pagination span {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #333;
+            border-radius: 4px;
+        }
+
+        .pagination a:hover {
+            background: #e9ecef;
+        }
+
+        .pagination .active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .pagination .disabled {
+            color: #ccc;
+            pointer-events: none;
+        }
+
+        .info {
+            color: #666;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<h1>게시글 목록</h1>
+
+<p class="info">
+    전체 <strong th:text="${posts.totalElements}">0</strong>건 |
+    <span th:text="${posts.pageNumber + 1}">1</span> /
+    <span th:text="${posts.totalPages}">1</span> 페이지
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th style="width: 60px">ID</th>
+        <th>제목</th>
+        <th>내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="post : ${posts.content}">
+        <td th:text="${post.id}">1</td>
+        <td th:text="${post.title}">제목</td>
+        <td th:text="${post.content}">내용</td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- 페이지네이션 -->
+<div class="pagination">
+    <!-- 이전 -->
+    <a th:if="${posts.hasPrevious}"
+       th:href="@{/(page=${posts.pageNumber - 1}, size=${posts.pageSize})}">
+        &laquo; 이전
+    </a>
+    <span th:unless="${posts.hasPrevious}" class="disabled">&laquo; 이전</span>
+
+    <!-- 페이지 번호 -->
+    <th:block th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}">
+        <span th:if="${i == posts.pageNumber}" class="active" th:text="${i + 1}">1</span>
+        <a th:unless="${i == posts.pageNumber}"
+           th:href="@{/(page=${i}, size=${posts.pageSize})}"
+           th:text="${i + 1}">1</a>
+    </th:block>
+
+    <!-- 다음 -->
+    <a th:if="${posts.hasNext}"
+       th:href="@{/(page=${posts.pageNumber + 1}, size=${posts.pageSize})}">
+        다음 &raquo;
+    </a>
+    <span th:unless="${posts.hasNext}" class="disabled">다음 &raquo;</span>
+</div>
+</body>
+</html>
