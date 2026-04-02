@@ -20,6 +20,72 @@ DB 없이 메모리 저장소를 사용해서 HTTP 메서드와 요청/응답 �
 - `PUT /todos/{id}` : 수정
 - `DELETE /todos/{id}` : 삭제
 
+## 주요 코드 사용법
+
+### @RestController CRUD 패턴
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/todos")
+public class TodoController {
+    private final TodoService todoService;
+
+    @GetMapping                                          // GET /todos
+    public List<Todo> getTodos() {
+        return todoService.findAll();
+    }
+
+    @GetMapping("/{id}")                                 // GET /todos/1
+    public Todo getTodo(@PathVariable Long id) {
+        return todoService.findById(id);
+    }
+
+    @PostMapping                                         // POST /todos
+    @ResponseStatus(HttpStatus.CREATED)                  // 201 반환
+    public Todo createTodo(@RequestBody TodoCreateRequest request) {
+        return todoService.create(request);
+    }
+
+    @PutMapping("/{id}")                                 // PUT /todos/1
+    public Todo updateTodo(@PathVariable Long id, @RequestBody TodoUpdateRequest request) {
+        return todoService.update(id, request);
+    }
+
+    @DeleteMapping("/{id}")                              // DELETE /todos/1
+    @ResponseStatus(HttpStatus.NO_CONTENT)               // 204 반환
+    public void deleteTodo(@PathVariable Long id) {
+        todoService.delete(id);
+    }
+}
+```
+
+### Java Record DTO
+
+```java
+public record TodoCreateRequest(
+        String title,
+        String description
+) {}
+```
+
+Jackson이 JSON `{"title":"...", "description":"..."}` → Record 객체로 자동 변환합니다.
+
+### @RestControllerAdvice 전역 예외 처리
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(TodoNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)                // 404 반환
+    public Map<String, String> handleTodoNotFound(TodoNotFoundException exception) {
+        return Map.of("message", exception.getMessage());
+    }
+}
+```
+
+`@ExceptionHandler`로 특정 예외를 잡아 HTTP 응답으로 변환합니다.
+
 ## 실행 방법
 
 ```powershell

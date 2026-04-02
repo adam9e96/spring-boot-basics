@@ -168,6 +168,55 @@ flowchart TB
     C --> MC --> VC
 ```
 
+## 주요 코드 사용법
+
+### @PathVariable — URL 경로 변수 추출
+
+```java
+@GetMapping("/function/{no}")
+public String selectFunction(@PathVariable Integer no) {
+    String view = switch (no) {    // Java 21 switch expression
+        case 1 -> "pathvariable/function1";
+        case 2 -> "pathvariable/function2";
+        case 3 -> "pathvariable/function3";
+        default -> "show";
+    };
+    return view;
+}
+```
+
+`/function/1` 요청 → `no = 1` → `function1.html` 렌더링
+
+### params 속성 — 같은 URL의 버튼별 분기
+
+```java
+@PostMapping(value = "send", params = "a")    // name="a" 버튼 클릭 시
+public String showAView() { return "submit/a"; }
+
+@PostMapping(value = "send", params = "b")    // name="b" 버튼 클릭 시
+public String showBView() { return "submit/b"; }
+
+@PostMapping(value = "send", params = "c")    // name="c" 버튼 클릭 시
+public String showCView() { return "submit/c"; }
+```
+
+### Thymeleaf에서 @PathVariable URL 생성
+
+```html
+<!-- 정적 링크 -->
+<a th:href="@{/function/1}">기능 1</a>
+
+<!-- 동적 링크 — 변수 사용 -->
+<a th:href="@{/function/{no}(no=${item.id})}">기능</a>
+
+<!-- 버튼 분기 폼 -->
+<form th:action="@{send}" method="post">
+    <input type="submit" value="버튼A" name="a">
+    <input type="submit" value="버튼B" name="b">
+    <input type="submit" value="버튼C" name="c">
+</form>
+```
+
 ## 핵심 학습 포인트
 
 1. **`@PathVariable`**: URL 경로의 `{변수}`를 메서드 파라미터로 자동 바인딩한다. 변수명이 같으면 `@PathVariable("no")`에서 이름 생략 가능

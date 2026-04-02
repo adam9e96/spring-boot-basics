@@ -184,6 +184,114 @@ classDiagram
     AccountController ..> Account : @ModelAttribute 바인딩
 ```
 
+## 주요 코드 사용법
+
+### @Entity + Validation 어노테이션
+
+```java
+@Entity
+@Getter @Setter @Builder
+@NoArgsConstructor @AllArgsConstructor
+public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "이름은 필수입니다")
+    private String name;
+
+    @NotBlank(message = "전화번호는 필수입니다")
+    private String phone;
+
+    private String address;
+
+    @NotNull
+    @Builder.Default
+    private Boolean privacyAgreement = false;
+}
+```
+
+### @ModelAttribute 양방향 바인딩
+
+**폼 표시 (GET)** — 빈 객체를 Model에 담아 뷰로 전달:
+
+```java
+@GetMapping("/new")
+public String createForm(Model model) {
+    model.addAttribute("account", new Account());  // 빈 객체 → 폼 필드 초기화
+    return "account/form";
+}
+```
+
+**폼 제출 (POST)** — `@ModelAttribute`로 폼 데이터를 객체에 자동 바인딩:
+
+```java
+@PostMapping
+public String create(
+        @Valid @ModelAttribute("account") Account account,  // 폼 → 객체 변환
+        BindingResult bindingResult,                         // 검증 오류 담김
+        RedirectAttributes redirectAttributes
+) {
+    if (bindingResult.hasErrors()) {
+        return "account/form";   // 오류 있으면 폼 재표시
+    }
+    Account saved = accountService.create(account);
+    redirectAttributes.addFlashAttribute("message", "계정이 생성되었습니다.");
+    return "redirect:/accounts/" + saved.getId();
+}
+```
+
+### Thymeleaf th:object + th:field 바인딩
+
+```html
+<form th:action="@{/accounts}" th:object="${account}" method="post">
+    <input type="text" th:field="*{name}"/>         <!-- account.name과 양방향 바인딩 -->
+    <span th:errors="*{name}">오류 메시지</span>     <!-- 검증 오류 표시 -->
+
+    <input type="text" th:field="*{phone}"/>
+    <input type="text" th:field="*{address}"/>
+    <input type="checkbox" th:field="*{privacyAgreement}"/>
+    <button type="submit">저장</button>
+</form>
+```
+
+### HiddenHttpMethodFilter — HTML 폼에서 PUT/DELETE
+
+```html
+<!-- PUT 요청 -->
+<form method="post" th:action="@{/accounts/{id}(id=${account.id})}">
+    <input type="hidden" name="_method" value="put"/>
+    <!-- 폼 필드들 -->
+    <button type="submit">수정</button>
+</form>
+
+<!-- DELETE 요청 -->
+<form method="post" th:action="@{/accounts/{id}(id=${account.id})}">
+    <input type="hidden" name="_method" value="delete"/>
+    <button type="submit">삭제</button>
+</form>
+```
+
+Controller에서 `@PutMapping`, `@DeleteMapping`으로 받습니다:
+
+```java
+@PutMapping("/{id}")
+public String update(@PathVariable Long id, @Valid @ModelAttribute("account") Account account,
+                     BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) return "account/edit";
+    accountService.update(id, account);
+    redirectAttributes.addFlashAttribute("message", "계정이 수정되었습니다.");
+    return "redirect:/accounts/" + id;
+}
+
+@DeleteMapping("/{id}")
+public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    accountService.delete(id);
+    redirectAttributes.addFlashAttribute("message", "계정이 삭제되었습니다.");
+    return "redirect:/accounts";
+}
+```
+
 ## 핵심 학습 포인트
 
 1. **`@Controller`**: 메서드가 반환하는 String은 뷰 이름이다. Thymeleaf가 `templates/` 아래에서 해당 이름의 HTML 파일을 찾아 렌더링한다
