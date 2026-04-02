@@ -18,6 +18,68 @@
 - `Chapter02LombokApplication.java`: 실행 시 콘솔에서 Lombok 사용 예시를 출력하는 진입점
 - `MemberTest.java`: Lombok으로 생성된 메서드가 기대대로 동작하는지 검증하는 테스트
 
+## 주요 코드 사용법
+
+### Lombok 어노테이션 적용 (Member.java)
+
+```java
+@Getter           // 모든 필드의 getter 자동 생성
+@Setter           // 모든 필드의 setter 자동 생성
+@NoArgsConstructor // 기본 생성자 — new Member()
+@AllArgsConstructor // 전체 필드 생성자 — new Member(id, name, email, age)
+@Builder           // 빌더 패턴 — Member.builder().name("Adam").build()
+@ToString          // toString() 자동 생성 — Member(id=1, name=Adam, ...)
+public class Member {
+    private Long id;
+    private String name;
+    private String email;
+    private int age;
+}
+```
+
+### Builder 패턴으로 객체 생성
+
+```java
+Member member = Member.builder()
+        .id(1L)
+        .name("Adam")
+        .email("adam@gmail.com")
+        .age(30)
+        .build();
+```
+
+### Getter/Setter 사용
+
+```java
+Member member = new Member();       // @NoArgsConstructor
+member.setId(2L);                    // @Setter
+member.setName("guilty");
+System.out.println(member.getName()); // @Getter → "guilty"
+```
+
+### AllArgsConstructor 사용
+
+```java
+Member member = new Member(3L, "John", "john@gmail.com", 40);
+```
+
+### Controller에서 Builder로 JSON 응답
+
+```java
+@RestController
+public class MemberController {
+    @GetMapping("/member")
+    public Member getMember() {
+        return Member.builder()
+                .id(1L)
+                .name("Spring Boot User")
+                .email("user@example.com")
+                .age(28)
+                .build();
+    }
+}
+```
+
 ## 실행 방법
 
 루트 프로젝트에서:
