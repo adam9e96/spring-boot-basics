@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}" lang="ko">
+
+<div layout:fragment="content" class="my-4">
+    <h2 th:text="${article.title}">제목</h2>
+
+    <div class="text-muted mb-3" style="font-size: 0.9rem;">
+        작성자: <span th:text="${article.author}">작성자</span>
+        &nbsp;&middot;&nbsp;
+        작성일: <span th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+        &nbsp;&middot;&nbsp;
+        조회수: <span th:text="${article.viewCount}">0</span>
+    </div>
+
+    <hr/>
+
+    <div style="white-space: pre-wrap;" th:text="${article.content}">본문</div>
+
+    <hr/>
+
+    <div class="d-flex gap-2">
+        <a href="/" class="btn btn-secondary">목록</a>
+        <form th:action="@{/article/delete/{id}(id=${article.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+        </form>
+    </div>
+</div>
+</html>

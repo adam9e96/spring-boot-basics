@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}" lang="ko">
+
+<!-- layout:decorate로 부모 레이아웃을 지정하면 layout:fragment="content" 부분만 교체됨 -->
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center my-3">
+        <h3 class="m-0">게시판</h3>
+        <a href="/article/write" class="btn btn-primary">글쓰기</a>
+    </div>
+
+    <table class="table table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th style="width: 60px;">번호</th>
+            <th>제목</th>
+            <th style="width: 100px;">작성자</th>
+            <th style="width: 150px;">작성일</th>
+            <th style="width: 80px;">조회수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="article : ${list}">
+            <td th:text="${article.id}"></td>
+            <td>
+                <a th:href="@{/article/{id}(id=${article.id})}" th:text="${article.title}"></a>
+            </td>
+            <td th:text="${article.author}"></td>
+            <td th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${article.viewCount}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 fragment 재사용 -->
+    <nav th:replace="~{fragments/pagination :: pager(
+        page=${list},
+        basePath='/',
+        field=${field},
+        keyword=${keyword},
+        start=${startPage},
+        end=${endPage}
+    )}"></nav>
+
+    <!-- 검색 fragment 재사용 -->
+    <th:block th:replace="~{fragments/search :: articleSearch(@{/}, ${field}, ${keyword})}"></th:block>
+</div>
+</html>

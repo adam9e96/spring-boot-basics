@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!--
+사용법:
+<nav th:replace="~{fragments/pagination :: pager(
+    page=${list},
+    basePath='/',
+    field=${field},
+    keyword=${keyword},
+    start=${startPage},
+    end=${endPage}
+)}"></nav>
+-->
+<th:block th:fragment="pager(page, basePath, field, keyword, start, end)">
+    <nav aria-label="pagination">
+        <ul class="pagination justify-content-center mt-4">
+            <!-- 맨 처음 -->
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{__${basePath}__(page=1, field=${field}, keyword=${keyword})}">&laquo;</a>
+            </li>
+            <!-- 이전 -->
+            <li class="page-item" th:classappend="${!page.hasPrevious} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{__${basePath}__(page=${T(java.lang.Math).max(page.number, 1)}, field=${field}, keyword=${keyword})}">&lsaquo;</a>
+            </li>
+            <!-- 페이지 번호 -->
+            <li class="page-item"
+                th:each="p : ${#numbers.sequence(start, end)}"
+                th:classappend="${p == (page.number + 1)} ? 'active'">
+                <a class="page-link" th:text="${p}"
+                   th:href="@{__${basePath}__(page=${p}, field=${field}, keyword=${keyword})}">1</a>
+            </li>
+            <!-- 다음 -->
+            <li class="page-item" th:classappend="${!page.hasNext} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{__${basePath}__(page=${T(java.lang.Math).min(page.number + 2, page.totalPages)}, field=${field}, keyword=${keyword})}">&rsaquo;</a>
+            </li>
+            <!-- 맨 끝 -->
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{__${basePath}__(page=${page.totalPages}, field=${field}, keyword=${keyword})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+</th:block>
+</html>

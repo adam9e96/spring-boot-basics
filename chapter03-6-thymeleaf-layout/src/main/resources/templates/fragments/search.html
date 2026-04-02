@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!-- 게시글 검색 폼 fragment -->
+<th:block th:fragment="articleSearch(action, field, keyword)">
+    <div class="row justify-content-center my-3">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+            <form class="input-group" th:action="${action}" method="get">
+                <input type="hidden" name="page" value="1"/>
+                <select class="form-select" name="field" style="max-width: 120px;">
+                    <option th:value="title" th:selected="${field == 'title'}">제목</option>
+                    <option th:value="author" th:selected="${field == 'author'}">작성자</option>
+                </select>
+                <input class="form-control" type="text" name="keyword"
+                       placeholder="검색어 입력" th:value="${keyword}">
+                <button class="btn btn-primary" type="submit">검색</button>
+                <a class="btn btn-outline-secondary" th:href="${action}">초기화</a>
+            </form>
+        </div>
+    </div>
+</th:block>
+</html>
