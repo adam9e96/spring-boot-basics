@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: chapter05-4-querydsl-search
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org.springframework: info
+    com.adam9e96.chapter054querydslsearch: debug
