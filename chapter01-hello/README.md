@@ -28,6 +28,36 @@ Spring Boot 웹 프로젝트를 가장 단순한 형태로 실행해보는 챕�
 - 브라우저에서 `http://localhost:8080` 접속
 - `Hello World` 메시지가 보이면 정상 실행입니다.
 
+## 주요 코드
+
+### @SpringBootApplication
+
+```java
+@SpringBootApplication
+public class Chapter01HelloApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(Chapter01HelloApplication.class, args);
+    }
+}
+```
+
+이 어노테이션 하나가 다음 3가지를 포함합니다:
+
+| 포함된 어노테이션 | 역할 |
+|-------------------|------|
+| `@SpringBootConfiguration` | 이 클래스가 설정 클래스임을 선언 |
+| `@EnableAutoConfiguration` | 클래스패스 기반 자동 설정 활성화 |
+| `@ComponentScan` | 하위 패키지의 `@Component` 빈 자동 스캔 |
+
+### 정적 리소스 서빙
+
+`src/main/resources/static/` 아래 파일은 별도 설정 없이 루트 경로에서 제공됩니다.
+
+```
+src/main/resources/static/index.html  →  http://localhost:8080/
+src/main/resources/static/css/style.css  →  http://localhost:8080/css/style.css
+```
+
 ## 파일 설명
 
 - `Chapter01HelloApplication.java`: 애플리케이션 시작 클래스
