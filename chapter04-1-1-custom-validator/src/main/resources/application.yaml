@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: chapter04-1-1-custom-validator
