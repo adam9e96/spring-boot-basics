@@ -37,6 +37,80 @@ Spring의 핵심 원리인 **DI(Dependency Injection)**와 **IoC(Inversion of Co
 | `GET` | `/notifications/channels` | 사용 가능한 채널 목록 |
 | `GET` | `/notifications/scope-demo` | Singleton vs Prototype 비교 |
 
+## 주요 코드 사용법
+
+### @Qualifier로 특정 빈 선택 + List 컬렉션 주입
+
+`@Qualifier`는 동일 타입 빈이 여러 개일 때 특정 빈을 지정합니다.
+Lombok `@RequiredArgsConstructor`는 `@Qualifier`를 복사하지 않으므로 명시적 생성자를 작성합니다.
+
+```java
+@Service
+public class NotificationService {
+    private final NotificationSender primarySender;     // 특정 빈 1개
+    private final List<NotificationSender> allSenders;  // 해당 타입 전체
+
+    public NotificationService(
+            @Qualifier("emailSender") NotificationSender primarySender,
+            List<NotificationSender> allSenders,
+            NotificationRepository repository,
+            NotificationLogger notificationLogger
+    ) {
+        this.primarySender = primarySender;   // emailSender 빈만 주입
+        this.allSenders = allSenders;          // email + sms + slack 전부 주입
+        // ...
+    }
+}
+```
+
+### @Configuration + @Bean 수동 빈 등록
+
+외부 라이브러리나 `@Component`를 붙일 수 없는 클래스를 빈으로 등록할 때 사용합니다.
+
+```java
+@Configuration
+public class NotificationConfig {
+    @Bean("slackSender")
+    public NotificationSender slackNotificationSender() {
+        return new SlackNotificationSender();  // POJO — @Component 없음
+    }
+}
+```
+
+### @Scope("prototype") 빈
+
+요청할 때마다 새 인스턴스를 생성합니다.
+
+```java
+@Configuration
+public class AppConfig {
+    @Bean
+    @Scope("prototype")
+    public PrototypeCounter prototypeCounter() {
+        return new PrototypeCounter();  // 매번 새 인스턴스
+    }
+}
+```
+
+### @PostConstruct / @PreDestroy 생명주기 콜백
+
+```java
+@Component
+public class NotificationLogger {
+    @PostConstruct
+    public void init() {
+        // 빈 생성 + 의존성 주입 완료 후 호출
+        log.info("NotificationLogger 빈이 초기화되었습니다");
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        // 애플리케이션 종료 시 빈 소멸 직전 호출
+        log.info("NotificationLogger 빈이 소멸됩니다");
+    }
+}
+```
+
 ## 실행 방법
 
 ```bash
