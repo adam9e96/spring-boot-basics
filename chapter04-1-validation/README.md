@@ -139,6 +139,101 @@ curl -X POST http://localhost:8080/members \
 }
 ```
 
+## 주요 코드 사용법
+
+### Bean Validation 어노테이션 (Request DTO)
+
+```java
+@Builder
+public record MemberCreateRequest(
+        @NotBlank(message = "이름은 필수입니다")
+        @Size(min = 2, max = 20)
+        String name,
+
+        @Email(message = "올바른 이메일 형식이 아닙니다")
+        @NotBlank(message = "이메일은 필수입니다.")
+        String email,
+
+        @NotBlank(message = "비밀번호는 필수입니다")
+        @Size(min = 8, max = 50, message = "비밀번호는 8자 이상이어야 합니다")
+        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$",
+                 message = "비밀번호는 영문자와 숫자를 모두 포함해야 합니다")
+        String password,
+
+        @NotNull @Min(0) @Max(150)
+        Integer age,
+
+        @Pattern(regexp = "\\d{3}-\\d{4}-\\d{4}",
+                 message = "전화번호 형식이 올바르지 않습니다 (010-xxxx-xxxx)")
+        String phone
+) {}
+```
+
+### Response DTO (비밀번호 제외)
+
+```java
+public record MemberResponse(
+        Long id, String name, String email, Integer age, String phone
+) {}
+```
+
+### @Valid @RequestBody — Controller에서 검증 활성화
+
+`@Valid`를 붙여야 Bean Validation이 작동합니다.
+
+```java
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/members")
+public class MemberController {
+    private final MemberService memberService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public MemberResponse create(@RequestBody @Valid MemberCreateRequest request) {
+        Member member = memberService.create(request);
+        return toResponse(member);
+    }
+
+    @GetMapping("{id}")
+    public MemberResponse findById(@PathVariable Long id) {
+        return toResponse(memberService.findById(id));
+    }
+
+    private MemberResponse toResponse(Member member) {
+        return new MemberResponse(
+                member.getId(), member.getName(), member.getEmail(),
+                member.getAge(), member.getPhone()
+        );
+    }
+}
+```
+
+### @RestControllerAdvice — 검증 실패 에러 응답
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    // 검증 실패 → 400 Bad Request + {필드: 에러메시지}
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+        return errors;
+    }
+
+    // 404 Not Found
+    @ExceptionHandler(MemberNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleMemberNotFoundException(MemberNotFoundException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+}
+```
+
 ## 구조 다이어그램
 
 ### 요청 흐름도

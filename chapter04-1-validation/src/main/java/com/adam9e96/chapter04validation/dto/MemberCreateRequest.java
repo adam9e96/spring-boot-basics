@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 @Builder
-
 public record MemberCreateRequest(
 
         @NotBlank(message = "이름은 필수입니다")
